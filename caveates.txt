@@ -1,0 +1,7 @@
+⚠️ Never run npx prisma migrate reset alone — it drops the whole DB including Supabase's auth schema, breaking your local auth.
+github
+
+
+****Do this instead*******
+npx supabase db reset          # ✅ Resets DB AND re-runs Supabase system setup
+npx prisma migrate deploy      # ✅ Then re-applies your Prisma migrations on top

@@ -1,0 +1,78 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:reset": "npx supabase db reset",
+
+    "prisma:generate:dev": "dotenv -e .env.development.local -- prisma generate",
+    "prisma:format": "prisma format",
+    "prisma:validate:dev": "dotenv -e .env.development.local -- prisma validate",
+    "prisma:migrate:dev": "dotenv -e .env.development.local -- prisma migrate dev",
+    "prisma:migrate:create": "dotenv -e .env.development.local -- prisma migrate dev --create-only",
+    "prisma:studio:dev": "dotenv -e .env.development.local -- prisma studio",
+    "prisma:db:push:dev": "dotenv -e .env.development.local -- prisma db push",
+    "prisma:db:pull:dev": "dotenv -e .env.development.local -- prisma db pull",
+
+
+    "prisma:generate:prod": "dotenv -e .env.production.local -- prisma generate",
+    "prisma:validate:prod": "dotenv -e .env.production.local -- prisma validate",
+    "prisma:migrate:deploy": "dotenv -e .env.production.local -- prisma migrate deploy",
+    "prisma:studio:prod": "dotenv -e .env.production.local -- prisma studio",
+
+
+    "dev:full": "npm run prisma:generate:dev && next dev",
+    "db:reset:full": "npm run supabase:reset && npm run prisma:migrate:deploy:local",
+
+    "prisma:migrate:deploy:local": "dotenv -e .env.development.local -- prisma migrate deploy",
+    
+    "build:prod": "dotenv -e .env.production.local -- prisma generate && next build",
+    "deploy:check": "dotenv -e .env.production.local -- prisma validate && dotenv -e .env.production.local -- prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.1",
+    "autoprefixer": "^10.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.3.1",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "lucide-react": "^0.525.0",
+    "next": "15.3.6",
+    "next-themes": "^0.4.6",
+    "pg": "^8.20.0",
+    "postcss": "^8.5.13",
+    "radix-ui": "^1.4.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-toastify": "^11.0.5",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4.2.4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.5",
+    "prisma": "^7.5.0",
+    "supabase": "^2.102.0",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5"
+  }
+}

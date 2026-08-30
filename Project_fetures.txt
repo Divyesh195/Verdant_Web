@@ -1,0 +1,22 @@
+This is a personal website only for Divyesh.
+
+
+1. Mood Tracker
+
+2. Investments
+
+3. Long/Short Term goals
+
+4. Learning of the day.
+
+5. Event/Project Management
+
+6. Call logs
+
+7. Expense calculator (Monthly/Yearly)
+
+8. Games Management (Already Played/ Current / Whishlist)
+
+9. Movies Management with Ratings (1-10)
+
+10. To-do list
