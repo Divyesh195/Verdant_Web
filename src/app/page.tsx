@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Calendar, Target, Wallet, TrendingUp, Film, ArrowRight, CheckCircle, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 const features = [
   {
@@ -44,7 +46,22 @@ const highlights = [
 ];
 
 const Landing = () => {
-  useEffect(() => { document.title = "Verdant · Your personal life dashboard"; }, []);
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    document.title = "Verdant · Your personal life dashboard";
+  }, []);
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/home");
+    }
+  }, [loading, router, user]);
+
+  if (loading || user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">

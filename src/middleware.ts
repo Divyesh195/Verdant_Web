@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 function getSafeNextPath(nextPath: string | null): string {
   if (!nextPath || !nextPath.startsWith("/") || nextPath.startsWith("//")) {
-    return "/";
+    return "/home";
   }
 
   return nextPath;
@@ -47,12 +47,22 @@ export async function middleware(request: NextRequest) {
   const { data: { user }, } = await supabase.auth.getUser();
 
   const isAuthPage = pathname === "/auth";
-  const isAuthCallback = pathname === "/auth/callback";
   const isPublicAuthPath = publicAuthPaths.has(pathname);
+
+  if (pathname === "/") {
+    if (user) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/home";
+      redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    return response;
+  }
 
   if (user && (pathname === "/auth/forget-pass" || pathname === "/auth/reset-pass")) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/";
+    redirectUrl.pathname = "/home";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
@@ -67,10 +77,7 @@ export async function middleware(request: NextRequest) {
   if (user && isAuthPage) {
     const nextPath = request.nextUrl.searchParams.get("next");
     const safeNextPath = getSafeNextPath(nextPath);
-    const redirectUrl = new URL(
-      safeNextPath,
-      request.url
-    );
+    const redirectUrl = new URL(safeNextPath, request.url);
     return NextResponse.redirect(redirectUrl);
   }
 

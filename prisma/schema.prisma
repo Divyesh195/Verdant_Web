@@ -16,6 +16,8 @@ model User {
   email         String   @unique
   name          String?
   image         String?
+  phone         Int?
+  dob            DateTime?
   role          Role     @default(user)
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())

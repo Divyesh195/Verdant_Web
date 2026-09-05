@@ -2,5 +2,4 @@ This is a personal website project where I can manage my goals, expenses, to-do 
 
 Here is technical overview of the project.
 
-
-1. Sign Up/ Register
+1. Sign Up/ Register/ Forgot Password --> Handled by supabase

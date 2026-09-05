@@ -1,0 +1,1 @@
+1. Supabase provided bucket 'divyesh_web_95' with 1GB total limit and, 2MB size limit per file.
