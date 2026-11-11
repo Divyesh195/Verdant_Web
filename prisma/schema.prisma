@@ -3,7 +3,39 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
+}
+
+enum EventStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ReminderFrequency {
+  ONCE
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum ReminderChannel {
+  WEB_PUSH
+  EMAIL
+}
+
+enum ReminderTarget {
+  START
+  DUE
+  END
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
 }
 
 enum Role {
@@ -11,18 +43,153 @@ enum Role {
   admin
 }
 
+// Extend the existing user model; do not replace authentication IDs.
 model User {
   id            String   @id @db.Uuid
   email         String   @unique
   name          String?
   image         String?
   phone         Int?
-  dob            DateTime?
+  dob           DateTime?
   role          Role     @default(user)
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  events        Event[]
+  pushSubscriptions PushSubscription[]
+  emailPreferences  EmailPreference?
+
   @@map("users")
 }
 
+model Event {
+  id          String   @id @default(cuid())
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  notes       String?
+  category    String? // MOVIE, SHOPPING, DEADLINE, etc. Keep flexible initially
+  status      EventStatus @default(ACTIVE)
+  requestKey  String @default(cuid())
+  dueAt       DateTime? @db.Timestamptz(3)
+  autoCompleteOnDue Boolean @default(false)
+  completedAt DateTime? @db.Timestamptz(3)
+  completionSource CompletionSource?
+
+  // At most one successor per completed event; create it only on user request.
+  previousEventId String? @unique
+  previousEvent Event? @relation("EventFollowUp", fields: [previousEventId], references: [id], onDelete: SetNull)
+  nextEvent Event? @relation("EventFollowUp")
+
+  // Optional date/time
+  startsAt    DateTime? @db.Timestamptz(3)
+  endsAt      DateTime? @db.Timestamptz(3)
+  allDay      Boolean  @default(false)
+
+  // Optional location/details
+  location    String?
+  url         String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reminders   Reminder[]
+
+  @@index([userId, status])
+  @@unique([userId, requestKey])
+  @@index([userId, startsAt])
+  @@index([status, startsAt])
+  @@index([status, autoCompleteOnDue, dueAt])
+}
+
+enum CompletionSource {
+  MANUAL
+  AUTOMATIC
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  frequency   ReminderFrequency
+  // Structured options: { "interval": 2, "weekdays": [1, 3] }.
+  // weekdays: Sunday=0 ... Saturday=6, WEEKLY only. No cron/RRULE mixing.
+  rule        Json?
+  timeZone    String @default("Asia/Kolkata")
+  channels    ReminderChannel[] @default([EMAIL])
+  // Immutable recurrence anchor, not the most recent successful send.
+  firstRunAt  DateTime @db.Timestamptz(3)
+  repeatUntil DateTime? @db.Timestamptz(3)
+
+  // When the user wants to be reminded relative to the event
+  offsetMinutes Int?   // e.g. -1440 = 1 day before; 0 = at event time
+  target ReminderTarget? // required when offsetMinutes is set
+
+  // Used for ALL reminders, whether the event is dated or dateless.
+  nextRunAt   DateTime? @db.Timestamptz(3)
+  lastSentAt  DateTime? @db.Timestamptz(3)
+  lastScheduledFor DateTime? @db.Timestamptz(3)
+
+  enabled     Boolean  @default(true)
+  retired     Boolean  @default(false)
+  lockedUntil DateTime? @db.Timestamptz(3)
+  lockToken   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deliveries  ReminderDelivery[]
+
+  @@index([enabled, nextRunAt])
+  @@index([eventId])
+}
+
+model ReminderDelivery {
+  id          String   @id @default(cuid())
+  reminderId  String
+  reminder    Reminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+
+  channel     ReminderChannel
+  recipientKey String // EMAIL or a push subscription ID (one record per device)
+  scheduledFor DateTime
+  sentAt      DateTime?
+  status      DeliveryStatus @default(PENDING)
+  error       String?
+  attemptCount Int @default(0)
+  nextAttemptAt DateTime? @db.Timestamptz(3)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([reminderId, channel, scheduledFor, recipientKey])
+  @@index([status, scheduledFor])
+  @@index([reminderId, scheduledFor])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model EmailPreference {
+  userId             String  @id @db.Uuid
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailEnabled       Boolean @default(true)
+  quietHoursStart    Int?    // hour 0-23
+  quietHoursEnd      Int?    // hour 0-23
+  updatedAt          DateTime @updatedAt
+}

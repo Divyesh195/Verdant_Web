@@ -11,7 +11,7 @@ function getSafeNextPath(nextPath: string | null): string {
 }
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
     "/auth/reset-pass",
   ]);
 
-  if (pathname.startsWith("/api/")) {
+  if (pathname.startsWith("/api/") || pathname === "/reminders-sw.js") {
     return response;
   }
 
@@ -69,6 +69,12 @@ export async function middleware(request: NextRequest) {
 
   if (!user && !isPublicAuthPath) {
     const redirectUrl = request.nextUrl.clone();
+    if (pathname === "/home" || pathname.startsWith("/home/")) {
+      redirectUrl.pathname = "/";
+      redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
+
     redirectUrl.pathname = "/auth";
     redirectUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(redirectUrl);

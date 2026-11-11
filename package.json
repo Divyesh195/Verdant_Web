@@ -6,11 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:events": "node --test --test-isolation=none scripts/reminder-schedule.test.mjs scripts/events.test.mjs",
+    "test:events:db": "node scripts/events-db-smoke.mjs",
     "lint": "next lint",
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:reset": "npx supabase db reset",
-
     "prisma:generate:dev": "dotenv -e .env.development.local -- prisma generate",
     "prisma:format": "prisma format",
     "prisma:validate:dev": "dotenv -e .env.development.local -- prisma validate",
@@ -19,19 +20,13 @@
     "prisma:studio:dev": "dotenv -e .env.development.local -- prisma studio",
     "prisma:db:push:dev": "dotenv -e .env.development.local -- prisma db push",
     "prisma:db:pull:dev": "dotenv -e .env.development.local -- prisma db pull",
-
-
     "prisma:generate:prod": "dotenv -e .env.production.local -- prisma generate",
     "prisma:validate:prod": "dotenv -e .env.production.local -- prisma validate",
     "prisma:migrate:deploy": "dotenv -e .env.production.local -- prisma migrate deploy",
     "prisma:studio:prod": "dotenv -e .env.production.local -- prisma studio",
-
-
     "dev:full": "npm run prisma:generate:dev && next dev",
     "db:reset:full": "npm run supabase:reset && npm run prisma:migrate:deploy:local",
-
     "prisma:migrate:deploy:local": "dotenv -e .env.development.local -- prisma migrate deploy",
-    
     "build:prod": "dotenv -e .env.production.local -- prisma generate && next build",
     "deploy:check": "dotenv -e .env.production.local -- prisma validate && dotenv -e .env.production.local -- prisma migrate deploy"
   },
@@ -51,8 +46,9 @@
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.525.0",
-    "next": "15.3.6",
+    "next": "15.5.9",
     "next-themes": "^0.4.6",
+    "nodemailer": "^10.5.0",
     "pg": "^8.20.0",
     "postcss": "^8.5.13",
     "radix-ui": "^1.4.3",
@@ -60,14 +56,17 @@
     "react-dom": "^19.0.0",
     "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "web-push": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
     "prisma": "^7.5.0",

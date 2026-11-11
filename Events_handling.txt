@@ -1,0 +1,30 @@
+EVENTS AND REMINDERS — IMPLEMENTED
+
+Application schema: prisma/schema.prisma
+Reference copy: Event_DB_Schema.prisma
+Complete capability list and setup guide: docs/events-and-reminders.md
+
+Implemented:
+- Owner-scoped event creation, editing, listing, manual completion and cancellation.
+- Optional deadline-based automatic completion.
+- Optional next deadline after completion: preserve the completed row and create a linked new event.
+- No direct User.reminders relation. Resolve the recipient through the event owner.
+- One-time, daily, weekly/selected weekdays, monthly and yearly reminder schedules.
+- Intervals of 1..100, optional repeat end, timezone-aware calculations, multiple reminders per event.
+- Email through Gmail SMTP; browser push through VAPID subscriptions and a service worker.
+- Last successful send and last handled occurrence, per-channel/device delivery tracking, retries and expiring worker leases.
+- Email opt-out and quiet hours. No snooze, digests, SMS or WhatsApp.
+- Additive migration: prisma/migrations/20261111000000_events_and_reminders/migration.sql
+
+Activation requires deployment environment values and a scheduler:
+- GMAIL_USER and GMAIL_APP_PASSWORD (Google app password).
+- CRON_SECRET, plus VAPID environment values if browser push is wanted.
+- An external scheduler calling GET /api/cron/reminders every minute with Authorization: Bearer <CRON_SECRET>.
+- Vercel Hobby built-in cron is daily-only; no incompatible per-minute Vercel cron is configured.
+
+The worker runs only when triggered. It does not promise exact-second delivery.
+Gmail SMTP cannot guarantee exactly-once sending after a crash; stable Message-IDs do not eliminate that limitation.
+
+Tests:
+npm run test:events
+npm run test:events:db

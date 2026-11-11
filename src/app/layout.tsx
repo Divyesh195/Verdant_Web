@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Feedback App",
+  title: "Verdant · Your personal life dashboard",
   description: "This website is an effort to learn Prisma ORM with Next js.",
 };
 

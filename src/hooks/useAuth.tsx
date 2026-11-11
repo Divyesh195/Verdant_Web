@@ -37,7 +37,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user: session?.user ?? null,
       session,
       loading,
-      signOut: async () => { await supabase.auth.signOut(); },
+      signOut: async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      },
     }}>
       {children}
     </Ctx.Provider>

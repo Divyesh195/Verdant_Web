@@ -1,0 +1,1 @@
+"/home" this route should not be available if user is not logged in. Currently after logging out, I stayed on same home page with everything 0 on count. Redirect to "/" route after logging out.

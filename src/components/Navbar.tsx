@@ -122,7 +122,7 @@ export const Navbar = () => {
                   onSelect={async (event) => {
                     event.preventDefault();
                     await signOut();
-                    router.push("/auth");
+                    window.location.replace("/");
                   }}
                 >
                   <LogOut className="h-4 w-4" />

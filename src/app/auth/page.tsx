@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -30,6 +30,10 @@ function getSafeNextPath(nextPath: string | null) {
 }
 
 export default function AuthPage() {
+  return <Suspense fallback={<p className="p-8" role="status">Loading sign in…</p>}><AuthForm /></Suspense>;
+}
+
+function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = getSafeNextPath(searchParams.get("next"));
@@ -153,7 +157,7 @@ export default function AuthPage() {
             <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-primary-gradient shadow-glow">
               <Leaf className="h-6 w-6 text-primary-foreground" />
             </div>
-            <CardTitle className="font-display text-2xl">Welcome to Divyesh's Website</CardTitle>
+            <CardTitle className="font-display text-2xl">Welcome to Divyesh&apos;s Website</CardTitle>
             <CardDescription>Your personal life dashboard</CardDescription>
           </CardHeader>
           <CardContent>
