@@ -8,6 +8,7 @@
     "start": "next start",
     "test:events": "node --test --test-isolation=none scripts/reminder-schedule.test.mjs scripts/events.test.mjs",
     "test:events:db": "node scripts/events-db-smoke.mjs",
+    "test:reminder-relay": "node --test --test-isolation=none scripts/reminder-relay.test.mjs",
     "lint": "next lint",
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
